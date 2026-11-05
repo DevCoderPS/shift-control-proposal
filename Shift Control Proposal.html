@@ -1,0 +1,447 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Shift Control Proposal</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800&family=Noto+Sans+Myanmar:wght@400;500;600;700&family=Noto+Serif+Myanmar:wght@600;700&display=swap">
+<style>
+/* Layout: left-aligned editorial scroll. Hero = thesis + "which one is mine" chooser; packages as a 4-up ladder; price calculator is the memorable moment. */
+:root{
+  --bg:#f3f6f2; --surface:#ffffff; --ink:#12231f; --muted:#55645f; --line:#d8e0db;
+  --accent:#0e7a63; --accent-ink:#ffffff; --accent-soft:#e0f0ea; --mark:#f0c04a; --mark-ink:#2b2100;
+  --warn-soft:#fbf3dc;
+  --sans:'Manrope','Noto Sans Myanmar',system-ui,sans-serif;
+  --serif:'Manrope','Noto Serif Myanmar','Noto Sans Myanmar',serif;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0c1715; --surface:#13231f; --ink:#e8f1ed; --muted:#9db1a9; --line:#25382f;
+    --accent:#3fc3a2; --accent-ink:#06201a; --accent-soft:#143229; --mark:#e2b445; --mark-ink:#241b00; --warn-soft:#2a2410;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0c1715; --surface:#13231f; --ink:#e8f1ed; --muted:#9db1a9; --line:#25382f;
+  --accent:#3fc3a2; --accent-ink:#06201a; --accent-soft:#143229; --mark:#e2b445; --mark-ink:#241b00; --warn-soft:#2a2410;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.85;margin:0}
+.wrap{max-width:1080px;margin:0 auto;padding-block:56px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+h1,h2,h3{font-family:var(--serif);line-height:1.5;margin:0;text-wrap:balance}
+h1{font-size:clamp(1.9rem,5.2vw,3.1rem);font-weight:700}
+h2{font-size:clamp(1.5rem,3.6vw,2.1rem);font-weight:700;margin-bottom:8px}
+h3{font-size:1.15rem;font-weight:700}
+p{margin:0}
+.lead{color:var(--muted);max-width:60ch}
+.num{font-variant-numeric:tabular-nums;font-family:'Manrope',sans-serif}
+a{color:var(--accent)}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px;border-radius:4px}
+.band{border-top:1px solid var(--line)}
+.band.alt{background:var(--surface)}
+
+/* top bar */
+.top{display:flex;align-items:center;justify-content:space-between;gap:12px;padding-block:14px}
+.brand{font-family:'Manrope',sans-serif;font-weight:800;font-size:1.1rem;letter-spacing:.01em}
+.brand i{display:inline-block;width:12px;height:12px;background:var(--accent);border-radius:3px;margin-right:8px;transform:rotate(45deg)}
+.top nav{display:flex;gap:18px;flex-wrap:wrap;font-size:.92rem}
+.top nav a{color:var(--muted);text-decoration:none}
+.top nav a:hover{color:var(--ink)}
+
+/* hero */
+.hero{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:48px;align-items:start}
+.hero .lead{margin-top:18px;font-size:1.05rem}
+.chooser{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:22px}
+.chooser h3{margin-bottom:6px}
+.chooser ul{list-style:none;margin:12px 0 0;padding:0}
+.chooser li+li{border-top:1px solid var(--line)}
+.chooser a{display:flex;justify-content:space-between;gap:12px;padding:12px 4px;text-decoration:none;color:var(--ink);align-items:center}
+.chooser a:hover b{color:var(--accent)}
+.chooser a span{color:var(--muted);font-size:.93rem}
+.chooser a b{white-space:nowrap}
+
+/* what it does */
+.three{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:32px;margin-top:28px}
+.three div{border-top:3px solid var(--accent);padding-top:14px}
+.three h3{margin-bottom:6px}
+.three p{color:var(--muted)}
+
+/* packages */
+.pk-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px;margin-top:28px;align-items:stretch}
+.pk{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:22px 20px;display:flex;flex-direction:column;gap:14px;min-width:0;position:relative}
+.pk.rec{border:2px solid var(--accent)}
+.pk .flag{position:absolute;top:-13px;left:16px;background:var(--mark);color:var(--mark-ink);font-size:.8rem;font-weight:600;padding:1px 12px;border-radius:99px;line-height:1.9}
+.pk .who{color:var(--muted);font-size:.93rem;min-height:3.7em}
+.price{display:flex;align-items:baseline;gap:6px;flex-wrap:wrap}
+.price b{font-family:'Manrope',sans-serif;font-size:2rem;font-weight:800;line-height:1.2;font-variant-numeric:tabular-nums}
+.price span{color:var(--muted);font-size:.88rem}
+.seats{background:var(--accent-soft);border-radius:8px;padding:8px 12px;font-size:.93rem}
+.seats b{font-variant-numeric:tabular-nums}
+.pk ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px;font-size:.93rem}
+.pk li{display:flex;gap:8px;align-items:flex-start}
+.pk .inherit{color:var(--muted);font-size:.88rem}
+.ck{flex:0 0 18px;width:18px;height:18px;margin-top:6px;color:var(--accent)}
+.pk .go{margin-top:auto;text-align:center;display:block;text-decoration:none;border:1.5px solid var(--accent);color:var(--accent);border-radius:10px;padding:6px 10px;font-weight:600}
+.pk.rec .go{background:var(--accent);color:var(--accent-ink)}
+.note{margin-top:18px;color:var(--muted);font-size:.9rem}
+
+/* feature glossary */
+.gl{margin-top:26px;border-top:1px solid var(--line)}
+.gl-row{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,2fr) minmax(0,1fr);gap:8px 28px;padding:16px 0;border-bottom:1px solid var(--line)}
+.gl-row h3{font-size:1.05rem}
+.gl-row p{color:var(--muted)}
+.tagp{display:inline-block;border-radius:99px;padding:0 12px;font-size:.88rem;line-height:1.9;font-variant-numeric:tabular-nums}
+.tagp.inc{background:var(--accent-soft);color:var(--accent)}
+.tagp.add{background:var(--warn-soft);color:var(--ink)}
+.gl-side{display:flex;flex-direction:column;gap:2px;align-items:flex-start}
+.gl-side small{color:var(--muted);font-size:.82rem;line-height:1.7}
+
+/* matrix */
+.scroll{overflow-x:auto;margin-top:26px;border:1px solid var(--line);border-radius:12px;background:var(--surface)}
+table{border-collapse:collapse;width:100%;min-width:640px;font-size:.95rem}
+th,td{padding:10px 14px;text-align:center;border-bottom:1px solid var(--line)}
+th:first-child,td:first-child{text-align:left}
+thead th{font-family:var(--serif);font-weight:700;background:var(--accent-soft)}
+tbody tr:last-child td{border-bottom:0}
+td .ck{margin:0 auto;display:block}
+.dash{color:var(--muted)}
+
+/* calculator */
+.calc{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);gap:28px;margin-top:28px;align-items:start}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:22px;min-width:0}
+.panel h3{margin-bottom:12px}
+.seg{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px}
+.seg label{position:relative}
+.seg input{position:absolute;opacity:0;inset:0}
+.seg span{display:block;text-align:center;border:1.5px solid var(--line);border-radius:10px;padding:8px 10px;font-size:.93rem;cursor:pointer}
+.seg input:checked+span{border-color:var(--accent);background:var(--accent-soft);font-weight:600}
+.seg input:focus-visible+span{outline:3px solid var(--accent);outline-offset:2px}
+.stepper{display:flex;align-items:center;gap:10px;margin-bottom:18px;flex-wrap:wrap}
+.stepper button{width:40px;height:40px;border-radius:10px;border:1.5px solid var(--line);background:var(--bg);color:var(--ink);font-size:1.25rem;cursor:pointer;line-height:1}
+.stepper button:hover{border-color:var(--accent)}
+.stepper input{width:64px;height:40px;text-align:center;font:inherit;font-weight:700;border:1.5px solid var(--line);border-radius:10px;background:var(--bg);color:var(--ink)}
+.checks{display:flex;flex-direction:column;gap:2px}
+.checks label{display:flex;gap:10px;align-items:flex-start;padding:8px 6px;border-radius:8px;cursor:pointer}
+.checks label:hover{background:var(--accent-soft)}
+.checks input{margin-top:9px;width:18px;height:18px;accent-color:var(--accent);flex:0 0 18px}
+.checks .nm{flex:1;min-width:0}
+.checks .pr{color:var(--muted);font-size:.88rem;white-space:nowrap;font-variant-numeric:tabular-nums}
+.verdict{background:var(--accent);color:var(--accent-ink);border-radius:12px;padding:18px 20px;margin-bottom:14px}
+.verdict small{display:block;opacity:.85;font-size:.88rem}
+.verdict b{display:block;font-family:'Manrope',sans-serif;font-size:2rem;font-weight:800;line-height:1.35;font-variant-numeric:tabular-nums}
+.res{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:10px}
+.res li{border:1px solid var(--line);border-radius:10px;padding:12px 14px}
+.res li.best{border:2px solid var(--accent)}
+.res .hd{display:flex;justify-content:space-between;gap:10px;align-items:baseline;flex-wrap:wrap}
+.res .hd b.t{font-family:'Manrope',sans-serif;font-variant-numeric:tabular-nums;font-size:1.1rem}
+.res .bd{color:var(--muted);font-size:.88rem;margin-top:2px;font-variant-numeric:tabular-nums}
+.badge{background:var(--mark);color:var(--mark-ink);border-radius:99px;font-size:.78rem;font-weight:600;padding:0 10px;margin-left:8px}
+.btn{font:inherit;font-weight:600;border:1.5px solid var(--accent);background:transparent;color:var(--accent);border-radius:10px;padding:6px 16px;cursor:pointer;margin-top:14px}
+.btn:hover{background:var(--accent-soft)}
+.btn.solid{background:var(--accent);color:var(--accent-ink)}
+.copied{margin-left:10px;color:var(--muted);font-size:.9rem}
+
+/* faq + contact */
+details{border-bottom:1px solid var(--line);padding:6px 0}
+details:first-of-type{border-top:1px solid var(--line)}
+summary{cursor:pointer;font-weight:600;padding:8px 0;list-style-position:outside}
+details p{color:var(--muted);padding:0 0 12px;max-width:68ch}
+.faq{margin-top:22px;max-width:760px}
+.contact{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin-top:24px}
+.contact div{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px 18px;min-width:0}
+.contact small{color:var(--muted);display:block}
+.contact b{font-family:'Manrope',sans-serif;font-size:1.15rem;user-select:all;word-break:break-all}
+footer{color:var(--muted);font-size:.85rem}
+
+@media (max-width:900px){
+  .pk-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .hero,.calc{grid-template-columns:minmax(0,1fr)}
+  .hero{gap:32px}
+}
+@media (max-width:640px){
+  .wrap{padding-block:40px}
+  .three,.contact{grid-template-columns:minmax(0,1fr)}
+  .three{gap:22px}
+  .pk-grid{grid-template-columns:minmax(0,1fr)}
+  .pk .who{min-height:0}
+  .gl-row{grid-template-columns:minmax(0,1fr)}
+  .top nav{display:none}
+}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+</style>
+
+<header>
+  <div class="wrap top" style="padding-block:14px">
+    <div class="brand"><i></i>Shift Control</div>
+    <nav aria-label="အပိုင်းများ">
+      <a href="#packages">Package များ</a>
+      <a href="#features">Feature များ</a>
+      <a href="#calc">ဈေးတွက်ရန်</a>
+      <a href="#faq">မေးလေ့ရှိသည်များ</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+<section class="band">
+  <div class="wrap hero">
+    <div>
+      <h1>ဒိုင်စာရင်းကို တစ်နေရာတည်းမှာ အလိုအလျောက် တွက်ပေးမယ့်စနစ်</h1>
+      <p class="lead">ဒိုင်နဲ့ ကော်မရှင်စားတွေ စာအုပ်ပေါ်ရေး၊ calculator နှိပ်၊ ဖုန်းနဲ့ လိုက်မေးနေရတာတွေကို စနစ်တစ်ခုထဲမှာ ပြောင်းလိုက်ပါ။ ဘာမှ မနားလည်သေးလည်း ရပါတယ်။ Package ၄ မျိုးထဲက သင့်အခြေအနေနဲ့ ကိုက်တာကို ရွေးပြီး၊ လိုတဲ့ feature ကိုပဲ ထပ်ထည့်နိုင်ပါတယ်။ ဈေးကိုလည်း အောက်မှာ ကိုယ်တိုင် တွက်ကြည့်နိုင်ပါတယ်။</p>
+    </div>
+    <aside class="chooser" aria-labelledby="chooser-h">
+      <h3 id="chooser-h">ကိုယ့်အခြေအနေက ဘယ်လိုလဲ</h3>
+      <p class="lead" style="font-size:.93rem">နှိပ်ရင် အသေးစိတ်ကို ကြည့်နိုင်ပါတယ်</p>
+      <ul id="chooser"></ul>
+    </aside>
+  </div>
+</section>
+
+<section class="band alt">
+  <div class="wrap">
+    <h2>စနစ်က ဘာလုပ်ပေးသလဲ</h2>
+    <div class="three">
+      <div>
+        <h3>ဒိုင်က အားလုံးကို ကြည့်နိုင်</h3>
+        <p>ဒိုင်က ကော်မရှင်စားတစ်ယောက်ချင်းစီကို အကောင့်ပေးပြီး၊ ဘယ်သူ ဘာထည့်ထားလဲ ဘယ်လောက်ရှိလဲ တစ်နေရာတည်းက ကြည့်နိုင်ပါတယ်။</p>
+      </div>
+      <div>
+        <h3>ကော်မရှင်စားက ဖုန်းကနေ ထည့်</h3>
+        <p>ကော်မရှင်စားတစ်ယောက်ချင်းစီ ကိုယ့်စာရင်းကို ဖုန်းထဲက ထည့်ရုံပါပဲ။ တခြားသူ့စာရင်းကို မမြင်ရအောင်လည်း ခွဲထားပါတယ်။</p>
+      </div>
+      <div>
+        <h3>ရှင်းတမ်းကို စနစ်က တွက်ပေး</h3>
+        <p>ပွဲစဉ် (shift) တစ်ခုချင်းစီရဲ့ စာရင်းကို ခွဲမှတ်ပြီး ရှင်းတမ်းကို အလိုအလျောက် တွက်ပေးတဲ့အတွက် လက်နဲ့ပေါင်းရတာ လျော့သွားပါတယ်။</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="band" id="packages">
+  <div class="wrap">
+    <h2>Package ၄ မျိုး</h2>
+    <p class="lead">လူဦးရေအလိုက် ရွေးပါ။ ဈေးနှုန်းအားလုံးက <span id="per-note">တစ်လ</span> အတွက် ကျပ်ငွေဖြစ်ပါတယ်။ ညာဘက်ကို သွားလေ ပါတဲ့ feature နဲ့ ကော်မရှင်စား များလေ ဖြစ်ပါတယ်။</p>
+    <div class="pk-grid" id="pk-grid"></div>
+    <p class="note" id="pk-note"></p>
+  </div>
+</section>
+
+<section class="band alt" id="features">
+  <div class="wrap">
+    <h2>Feature တစ်ခုချင်း ဘာလဲ</h2>
+    <p class="lead">နည်းပညာစကားတွေ မသုံးဘဲ ရိုးရိုး ရှင်းထားပါတယ်။ Package မှာ မပါတဲ့ feature ကို လိုမှ ထပ်ထည့်လို့ရပြီး၊ ထပ်ထည့်ရင် အောက်ပါ ဈေးတွေ ပေါင်းပါမယ်။</p>
+    <div class="gl" id="gl"></div>
+  </div>
+</section>
+
+<section class="band">
+  <div class="wrap">
+    <h2>Package ယှဉ်ကြည့်ရန်</h2>
+    <div class="scroll"><table id="matrix"></table></div>
+  </div>
+</section>
+
+<section class="band alt" id="calc">
+  <div class="wrap">
+    <h2>ကိုယ့်ဈေးကို ကိုယ်တိုင်တွက်ကြည့်ပါ</h2>
+    <p class="lead">လူဘယ်နှယောက်သုံးမလဲ၊ ဘာတွေ လိုချင်လဲ ရွေးလိုက်ရင် Package တစ်ခုချင်းစီမှာ ဘယ်လောက်ကျမလဲ၊ ဘယ်ဟာက အသက်သာဆုံးလဲ ချက်ချင်းပြပါမယ်။</p>
+    <div class="calc">
+      <div class="panel">
+        <h3>၁။ ဘယ်လို သုံးမလဲ</h3>
+        <div class="seg" role="radiogroup" aria-label="သုံးမည့်ပုံစံ">
+          <label><input type="radio" name="mode" id="mode-dai" value="dai" checked><span>ဒိုင်လုပ်ပြီး ကော်မရှင်စားတွေ ခိုင်းမယ်</span></label>
+          <label><input type="radio" name="mode" id="mode-solo" value="solo"><span>ကိုယ်တစ်ယောက်တည်း</span></label>
+        </div>
+        <div id="agents-box">
+          <label for="agents" style="font-weight:600;display:block">ကော်မရှင်စား ဘယ်နှစ်ယောက်လဲ</label>
+          <div class="stepper">
+            <button type="button" id="minus" aria-label="လျှော့ရန်">−</button>
+            <input id="agents" type="number" inputmode="numeric" min="1" max="40" value="5">
+            <button type="button" id="plus" aria-label="တိုးရန်">+</button>
+            <span class="lead" style="font-size:.9rem">ယောက်</span>
+          </div>
+        </div>
+        <h3>၂။ လိုချင်တဲ့ feature</h3>
+        <p class="lead" style="font-size:.9rem;margin-bottom:6px">ရှင်းတမ်း၊ ငွေပေးချေမှု၊ ဖိုင်ထုတ်ခြင်း၊ လုံခြုံရေး ၂ ဆင့်စစ်ခြင်းတို့က Package တိုင်းမှာ ပါပြီးသားပါ။</p>
+        <div class="checks" id="checks"></div>
+      </div>
+      <div class="panel" aria-live="polite">
+        <div class="verdict" id="verdict"></div>
+        <ul class="res" id="res"></ul>
+        <button class="btn" type="button" id="copy">ရွေးထားတာကို စာအဖြစ် ကူးယူမယ်</button><span class="copied" id="copied" role="status"></span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="band" id="faq">
+  <div class="wrap">
+    <h2>မေးလေ့ရှိတာတွေ</h2>
+    <div class="faq">
+      <details><summary>ဒိုင်နဲ့ ကော်မရှင်စား ဘာကွာလဲ</summary><p>ဒိုင်က စာရင်းကို ပိုင်ဆိုင်ပြီး ကော်မရှင်စားတွေကို စီမံသူပါ။ ကော်မရှင်စားက ဒိုင်ဆီက စာရင်းလက်ခံပြီး ကိုယ့်ပိုင်းကို ထည့်သူပါ။ ကိုယ်တစ်ယောက်တည်း ကော်မရှင်စားလုပ်မယ်ဆိုရင် Starter က လုံလောက်ပါတယ်။</p></details>
+      <details><summary>Package မှာ မပါတဲ့ feature ကို နောက်မှ ထပ်ထည့်လို့ရလား</summary><p>ရပါတယ်။ ဒီစာမျက်နှာက feature စာရင်းမှာ ပြထားတဲ့ ထပ်ဆောင်းဈေးကို လစဉ်ကြေးထဲ ပေါင်းပါမယ်။ Package တစ်ခုအထက်ကို တက်လိုက်တာက ပိုသက်သာနိုင်ပါတယ်။ အပေါ်က ဈေးတွက်စက်ကို သုံးကြည့်ပါ။</p></details>
+      <details><summary>ကော်မရှင်စား Package ပါတာထက် ပိုလိုလာရင်</summary><p>တစ်ယောက်ထပ်တိုးတိုင်း <span id="extra-faq">50,000 ကျပ်</span> ထပ်ပေါင်းပါမယ်။ ကော်မရှင်စားအရေအတွက်ကို တစ်ခါတည်း ဆုံးဖြတ်စရာ မလိုပါဘူး။</p></details>
+      <details><summary>Package ကို နောက်မှ ပြောင်းလို့ရလား</summary><p>ရပါတယ်။ လုပ်ငန်းကြီးလာရင် ပိုကြီးတဲ့ Package ကို ပြောင်းနိုင်ပါတယ်။ ပြောင်းတဲ့အခါ ပါဝင်တဲ့ feature နဲ့ လူဦးရေကို အသစ်အတိုင်း ပြန်တွက်ပေးပါမယ်။</p></details>
+      <details><summary>စမ်းသုံးကြည့်လို့ရလား</summary><p>ဆက်သွယ်ရန်ကနေ မေးမြန်းနိုင်ပါတယ်။ စမ်းသုံးမှု အခြေအနေကို တိုက်ရိုက် ပြောပြပါမယ်။</p></details>
+    </div>
+  </div>
+</section>
+
+<section class="band alt">
+  <div class="wrap">
+    <h2>စတင်ဖို့ ဆက်သွယ်ပါ</h2>
+    <p class="lead">ဈေးတွက်စက်မှာ ရွေးထားတာကို ကူးယူပြီး ပို့ပေးလိုက်ရင် လိုအပ်တာကို ချက်ချင်း ပြန်လည်ဖြေကြားပါမယ်။</p>
+    <div class="contact" id="contact"></div>
+    <p class="note" style="margin-top:28px">ဈေးနှုန်းများကို ဒီစာမျက်နှာထဲက အချက်အလက်အတိုင်း တွက်ထားခြင်းဖြစ်ပါတယ်။</p>
+  </div>
+</section>
+</main>
+
+<script>
+/* ===== Editable settings: change prices and contact details here ===== */
+const PERIOD = 'တစ်လ';
+const EXTRA_AGENT = 50000;          // ကော်မရှင်စား တစ်ယောက်ထပ်တိုးဈေး (ဒိုင် package များအတွက်)
+const CONTACTS = [
+  {label:'Viber / ဖုန်း', value:'09-XXX-XXX-XXX'},
+  {label:'Telegram', value:'@your_username'},
+  {label:'Facebook Page', value:'facebook.com/yourpage'}
+];
+const FEATURES = [
+  {k:'settlement', name:'ရှင်းတမ်းတွက်ချက်ခြင်း', desc:'ပွဲစဉ်တစ်ခုပြီးတိုင်း အနိုင်အရှုံး ရှင်းရမယ့်ပမာဏကို စနစ်က တွက်ပေးပါတယ်။ လက်နဲ့ ပေါင်းနှုတ်စရာ မလိုပါဘူး။', base:true},
+  {k:'payments', name:'ငွေပေးချေမှု မှတ်တမ်း', desc:'ဘယ်သူ ဘယ်လောက်ပေးပြီး ဘယ်လောက်ကျန်သေးလဲ မှတ်ထားပေးပါတယ်။', base:true},
+  {k:'export', name:'စာရင်းကို ဖိုင်ထုတ်ခြင်း', desc:'စာရင်းတွေကို Excel လို ဖိုင်အဖြစ် ထုတ်သိမ်းထားလို့ရပါတယ်။', base:true},
+  {k:'twofa', name:'လုံခြုံရေး ၂ ဆင့်စစ်ခြင်း', desc:'ဝင်တဲ့အခါ စကားဝှက်အပြင် ဖုန်းထဲက ကုဒ်နဲ့ ထပ်စစ်ပါတယ်။ အကောင့်ကို တခြားသူ မဝင်နိုင်အောင် ကာကွယ်ပေးပါတယ်။', base:true},
+  {k:'void', name:'မှားထည့်တာ ပယ်ဖျက်ခြင်း', desc:'မှားထည့်မိတဲ့ စာရင်းကို ဖျက်ပစ်မယ့်အစား ပယ်ထားတယ်လို့ မှတ်ပါတယ်။ ဘာဖြစ်ခဲ့လဲ မှတ်တမ်းကျန်ပါတယ်။', add:10000},
+  {k:'reports', name:'အစီရင်ခံစာများ', desc:'နေ့၊ ပွဲစဉ်၊ ကော်မရှင်စားအလိုက် စုစုပေါင်းကို ဇယားနဲ့ ကြည့်လို့ရပါတယ်။', add:25000},
+  {k:'limits', name:'ကန့်သတ်ချက် သတ်မှတ်ခြင်း', desc:'ကော်မရှင်စားတစ်ယောက်ချင်းစီအတွက် လက်ခံမယ့် ပမာဏကို ကန့်သတ်ထားလို့ရပါတယ်။', add:20000},
+  {k:'audit', name:'ပြောင်းလဲမှု မှတ်တမ်း', desc:'ဘယ်သူ ဘာကို ဘယ်အချိန် ပြောင်းလဲခဲ့လဲ အကုန်မှတ်ထားပါတယ်။ အငြင်းပွားရင် စစ်လို့ရပါတယ်။', add:20000},
+  {k:'telegram', name:'Telegram သတိပေးချက်', desc:'အရေးကြီးတာတွေ ဖြစ်တဲ့အခါ Telegram ကို အလိုအလျောက် စာပို့ပေးပါတယ်။', add:25000},
+  {k:'branding', name:'ကိုယ့်လုပ်ငန်းအမည် ပြောင်းထည့်ခြင်း', desc:'စနစ်ထဲမှာ ကိုယ့်လုပ်ငန်းအမည်၊ လိုဂိုနဲ့ အရောင်ကို ထည့်သုံးလို့ရပါတယ်။', add:20000}
+];
+const PACKAGES = [
+  {id:'starter', name:'ကော်မရှင်စား Starter', short:'Starter', role:'solo', seats:0, price:50000,
+   who:'ကိုယ်တစ်ယောက်တည်း ကော်မရှင်စားလုပ်ပြီး ကိုယ့်စာရင်းကို ကိုယ်တိုင်ကိုင်မယ့်သူ',
+   pick:'ကိုယ်တစ်ယောက်တည်း စာရင်းကိုင်မယ်',
+   f:['settlement','payments','export','twofa']},
+  {id:'mini', name:'ဒိုင် Mini', short:'Mini', role:'dai', seats:3, price:150000,
+   who:'ဒိုင်လုပ်ငန်း အသေးစား၊ ကော်မရှင်စား ၃ ယောက်အထိ',
+   pick:'ကော်မရှင်စား ၃ ယောက်အထိ',
+   f:['settlement','payments','export','twofa','void']},
+  {id:'standard', name:'ဒိုင် Standard', short:'Standard', role:'dai', seats:6, price:250000, rec:true,
+   who:'ဒိုင်လုပ်ငန်း အလတ်စား၊ ကော်မရှင်စား ၆ ယောက်အထိ',
+   pick:'ကော်မရှင်စား ၆ ယောက်အထိ',
+   f:['settlement','payments','export','twofa','void','reports','limits','audit','telegram']},
+  {id:'pro', name:'ဒိုင် Pro', short:'Pro', role:'dai', seats:10, price:450000,
+   who:'ဒိုင်လုပ်ငန်း အကြီးစား၊ ကော်မရှင်စား ၁၀ ယောက်အထိ',
+   pick:'ကော်မရှင်စား ၁၀ ယောက်အထိ',
+   f:['settlement','payments','export','twofa','void','reports','limits','audit','telegram','branding']}
+];
+/* ===================================================================== */
+
+const $ = s => document.querySelector(s);
+const fmt = n => n.toLocaleString('en-US');
+const F = Object.fromEntries(FEATURES.map(x => [x.k, x]));
+const CHK = '<svg class="ck" viewBox="0 0 18 18" aria-hidden="true"><path d="M3.5 9.5l3.4 3.4 7.6-8" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+const seatText = p => p.role === 'solo' ? 'ကိုယ်တိုင် ၁ ဦး' : 'ကော်မရှင်စား <b>' + p.seats + '</b> ဦးအထိ ပါပြီး';
+
+$('#per-note').textContent = PERIOD;
+$('#extra-faq').textContent = fmt(EXTRA_AGENT) + ' ကျပ်';
+
+/* chooser */
+$('#chooser').innerHTML = PACKAGES.map(p =>
+  `<li><a href="#pk-${p.id}"><span>${p.pick}</span><b class="num">${p.short}</b></a></li>`).join('');
+
+/* package cards */
+$('#pk-grid').innerHTML = PACKAGES.map((p, i) => {
+  const prev = PACKAGES[i - 1];
+  const fresh = prev ? p.f.filter(k => !prev.f.includes(k)) : p.f;
+  const head = prev ? `<p class="inherit">${prev.short} ရဲ့ အားလုံးပါပြီး ထပ်ပါတာ</p>` : `<p class="inherit">ပါဝင်တာ</p>`;
+  return `<article class="pk${p.rec ? ' rec' : ''}" id="pk-${p.id}">
+    ${p.rec ? '<span class="flag">အကြံပြု</span>' : ''}
+    <h3>${p.name}</h3>
+    <p class="who">${p.who}</p>
+    <div class="price"><b>${fmt(p.price)}</b><span>ကျပ် / ${PERIOD}</span></div>
+    <div class="seats">${seatText(p)}</div>
+    ${head}
+    <ul>${fresh.map(k => `<li>${CHK}<span>${F[k].name}</span></li>`).join('')}</ul>
+    <a class="go" href="#calc">ဈေးတွက်ကြည့်မယ်</a>
+  </article>`;
+}).join('');
+$('#pk-note').textContent = 'ပါဝင်တဲ့ ကော်မရှင်စားအရေအတွက်ထက် ပိုလိုရင် တစ်ယောက်ကို ' + fmt(EXTRA_AGENT) + ' ကျပ် ထပ်ပေါင်းပါမယ် (ဒိုင် Package များအတွက်)။';
+
+/* glossary */
+const incIn = k => PACKAGES.filter(p => p.f.includes(k));
+$('#gl').innerHTML = FEATURES.map(x => {
+  const inc = incIn(x.k);
+  const side = x.base
+    ? `<span class="tagp inc">Package အားလုံးမှာ ပါပြီး</span>`
+    : `<span class="tagp add">ထပ်ထည့်ရင် +${fmt(x.add)} ကျပ်</span><small>${inc.map(p => p.short).join('၊ ')} မှာ ပါပြီးသား</small>`;
+  return `<div class="gl-row"><h3>${x.name}</h3><p>${x.desc}</p><div class="gl-side">${side}</div></div>`;
+}).join('');
+
+/* matrix */
+$('#matrix').innerHTML =
+  `<thead><tr><th scope="col">Feature</th>${PACKAGES.map(p => `<th scope="col">${p.short}</th>`).join('')}</tr></thead><tbody>` +
+  `<tr><td><b>လစဉ်ကြေး (ကျပ်)</b></td>${PACKAGES.map(p => `<td class="num"><b>${fmt(p.price)}</b></td>`).join('')}</tr>` +
+  `<tr><td><b>ပါဝင်သော ကော်မရှင်စား</b></td>${PACKAGES.map(p => `<td class="num">${p.role === 'solo' ? 'ကိုယ်တိုင်' : p.seats + ' ဦး'}</td>`).join('')}</tr>` +
+  FEATURES.map(x => `<tr><td>${x.name}</td>${PACKAGES.map(p => p.f.includes(x.k)
+     ? `<td>${CHK}<span class="sr" style="position:absolute;left:-9999px">ပါ</span></td>`
+     : `<td class="dash"><span aria-hidden="true">—</span><span style="position:absolute;left:-9999px">မပါ</span></td>`).join('')}</tr>`).join('') + '</tbody>';
+
+/* calculator */
+const optional = FEATURES.filter(x => !x.base);
+const selected = new Set(['reports', 'telegram']);
+$('#checks').innerHTML = optional.map(x =>
+  `<label for="c-${x.k}"><input type="checkbox" id="c-${x.k}" data-k="${x.k}"${selected.has(x.k) ? ' checked' : ''}><span class="nm">${x.name}</span><span class="pr">+${fmt(x.add)}</span></label>`).join('');
+
+function quote(p, n, sel) {
+  const extra = p.role === 'solo' ? 0 : Math.max(0, n - p.seats);
+  const extraCost = extra * EXTRA_AGENT;
+  const adds = [...sel].filter(k => !p.f.includes(k));
+  const addCost = adds.reduce((s, k) => s + F[k].add, 0);
+  return {p, extra, extraCost, adds, addCost, total: p.price + extraCost + addCost};
+}
+function render() {
+  const solo = $('#mode-solo').checked;
+  $('#agents-box').hidden = solo;
+  let n = Math.max(1, Math.min(40, parseInt($('#agents').value, 10) || 1));
+  const sel = new Set([...document.querySelectorAll('#checks input:checked')].map(i => i.dataset.k));
+  const list = PACKAGES.filter(p => solo ? p.role === 'solo' : p.role === 'dai').map(p => quote(p, n, sel));
+  const best = list.reduce((a, b) => b.total < a.total ? b : a);
+  $('#verdict').innerHTML = `<small>သင့်အတွက် အသက်သာဆုံး</small><b>${best.p.name}</b><b>${fmt(best.total)} ကျပ် / ${PERIOD}</b>`;
+  $('#res').innerHTML = list.map(q => {
+    const parts = [`Package ${fmt(q.p.price)}`];
+    if (q.extra) parts.push(`ကော်မရှင်စား ${q.extra} ဦးထပ် ${fmt(q.extraCost)}`);
+    q.adds.forEach(k => parts.push(`${F[k].name} ${fmt(F[k].add)}`));
+    if (parts.length === 1 && !q.adds.length) parts.push('ထပ်ပေါင်းစရာ မရှိပါ');
+    return `<li class="${q === best ? 'best' : ''}"><div class="hd"><span><b>${q.p.name}</b>${q === best ? '<span class="badge">အသက်သာဆုံး</span>' : ''}</span><b class="t">${fmt(q.total)} ကျပ်</b></div><div class="bd">${parts.join(' + ')}</div></li>`;
+  }).join('');
+  render.last = {solo, n, sel, best, list};
+}
+document.addEventListener('input', e => { if (e.target.closest('.calc')) render(); });
+document.addEventListener('change', e => { if (e.target.closest('.calc')) render(); });
+$('#minus').onclick = () => { $('#agents').value = Math.max(1, (parseInt($('#agents').value, 10) || 1) - 1); render(); };
+$('#plus').onclick = () => { $('#agents').value = Math.min(40, (parseInt($('#agents').value, 10) || 1) + 1); render(); };
+render();
+
+$('#copy').onclick = async () => {
+  const {solo, n, sel, best, list} = render.last;
+  const feats = [...sel].map(k => F[k].name).join('၊ ') || 'ထပ်ဆောင်း feature မရှိ';
+  const text = `Shift Control ဈေးတွက်ချက်ချက်ရလဒ်\n` + (solo ? 'သုံးပုံ: ကိုယ်တစ်ယောက်တည်း' : `သုံးပုံ: ဒိုင်၊ ကော်မရှင်စား ${n} ယောက်`) +
+    `\nလိုချင်သော feature: ${feats}\nအသက်သာဆုံး: ${best.p.name} = ${fmt(best.total)} ကျပ် / ${PERIOD}`;
+  const done = m => { $('#copied').textContent = m; setTimeout(() => $('#copied').textContent = '', 3500); };
+  try { await navigator.clipboard.writeText(text); done('ကူးယူပြီးပါပြီ'); }
+  catch (e) {
+    const ta = document.createElement('textarea'); ta.value = text; ta.style.cssText = 'position:fixed;opacity:0';
+    document.body.appendChild(ta); ta.select();
+    let ok = false; try { ok = document.execCommand('copy'); } catch (_) {}
+    ta.remove(); done(ok ? 'ကူးယူပြီးပါပြီ' : 'ကူးမရပါ၊ အပေါ်ကစာကို ရွေးကူးပါ');
+  }
+};
+
+/* contacts */
+$('#contact').innerHTML = CONTACTS.map(c => `<div><small>${c.label}</small><b>${c.value}</b></div>`).join('');
+</script>
+
+</body></html>
